@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<settings>
+   <term_server>
+      <str_dummysrv1>dc-ts02</str_dummysrv1>
+      <str_dummysrv2>dc-ts03</str_dummysrv2>
+      <str_dummysrv3>dc-ts04</str_dummysrv3>
+   </term_server>
+   <upd_serverer_im>
+      <str_Server_test1>10.240.1.30/tsd_im</str_Server_test1>
+	  <str_Server_test03>dc-test03/tsd_im</str_Server_test03>
+	  <str_Server_ts-04>dc-ts04/tsd_im</str_Server_ts-04>
+   </upd_serverer_im>
+   <upd_serverer_global>
+   	  <str_Server_ts-02>dc-ts02/tsd</str_Server_ts-02>
+	  <str_Server_ts-03>dc-ts03/tsd</str_Server_ts-03>
+   </upd_serverer_global>
+</settings>

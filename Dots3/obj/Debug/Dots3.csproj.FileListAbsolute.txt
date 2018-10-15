@@ -1,0 +1,8 @@
+C:\VSProjects\SDP3\SDP3\bin\Debug\SDP3.exe
+C:\VSProjects\SDP3\SDP3\bin\Debug\SDP3.pdb
+C:\VSProjects\Dots3\Dots3\obj\Debug\ResolveAssemblyReference.cache
+C:\VSProjects\Dots3\Dots3\obj\Debug\SDP3.DeviceProvisor.resources
+C:\VSProjects\Dots3\Dots3\obj\Debug\SDP3.Properties.Resources.resources
+C:\VSProjects\Dots3\Dots3\obj\Debug\SDP3.csproj.GenerateResource.Cache
+C:\VSProjects\Dots3\Dots3\obj\Debug\SDP3.exe
+C:\VSProjects\Dots3\Dots3\obj\Debug\SDP3.pdb

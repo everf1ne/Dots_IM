@@ -1,0 +1,88 @@
+REGEDIT4
+
+[HKEY_CURRENT_USER\SOFTWARE\Symbol\AppCenter]
+"ShowHome"=dword:00000000
+"ShowBatteryLevel"=dword:00000001
+"ShowSignalStrength"=dword:00000001
+"ShowAirBEAM"=dword:00000000
+"ShowTime"=dword:00000000
+"HideSip"=dword:00000001
+"HideStartMenu"=dword:00000001
+
+[HKEY_CURRENT_USER\SOFTWARE\Symbol\AppCenter\Global]
+"Description"="Global"
+"Execute"="\\Temp\\tsd_autosetup\\run\\do_global.exe"
+"Arguments"=""
+"IconFile"="\\Windows\\cetsc.exe"
+"ExeName1"="do_global.exe"
+"ExeName2"="mortscript.exe"
+"ExeName3"="cetsc.exe"
+"Window1"="*|*"
+"AddToToolsMenu"=dword:00000000
+"AlwaysLaunch"=dword:00000000
+"ReadOnly"=dword:00000000
+"HideFromUser"=dword:00000000
+"HideAllTaskBars"=dword:00000001
+"HideDoneButton"=dword:00000000
+"HideStartMenu"=dword:00000001
+"HideSip"=dword:00000001
+"AutoStart"=dword:00000000
+"StartupDelay"=dword:00000000
+"RelaunchInterval"=dword:00000000
+
+[HKEY_CURRENT_USER\SOFTWARE\Symbol\AppCenter\System Windows]
+"Description"="System Windows"
+"Execute"=""
+"Arguments"=""
+"IconFile"="*.exe"
+"ExeName1"="cetsc.exe"
+"ExeName2"="*.exe"
+"Window1"="Application Error*|*"
+"Window2"="Error*|*"
+"Window3"="ts-glb01 - Remote Desktop|*"
+"Window4"="\\Temp\\tsd_autosetup\\run\\global.rdp - ts-glb01 - Remote Desktop|*"
+"Window5"="ts-glb02 - Remote Desktop|*"
+"Window6"="\\Temp\\tsd_autosetup\\run\\global.rdp - ts-glb02 - Remote Desktop|*"
+"Window7"="Remote Desktop Disconnected|*"
+"Window8"="Remote Desktop Connection|*"
+"Window9"="Connecting*|*"
+"AddToToolsMenu"=dword:00000000
+"AlwaysLaunch"=dword:00000000
+"ReadOnly"=dword:00000000
+"HideFromUser"=dword:00000001
+"HideAllTaskBars"=dword:00000001
+"HideDoneButton"=dword:00000000
+"HideStartMenu"=dword:00000001
+"HideSip"=dword:00000001
+"AutoStart"=dword:00000000
+"StartupDelay"=dword:00000000
+"RelaunchInterval"=dword:00000000
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Symbol\AppCenter]
+"FusionMode"=dword:00000000
+"DisplayIpAddress"=dword:00000001
+"{2EACC9DF-C9BF-428E-9074-D50B57D0D747}"="{SMD5}i3LFHdwY6A3Yaar4YBbIwpFCsYtlkupP"
+"DisplayMacAddress"=dword:00000000
+"BrowseControlPanel"=dword:00000000
+"BrowseAllShortcuts"=dword:00000000
+"ShowKeyStates"=dword:00000001
+"MobileCompanionMode"=dword:00000000
+"RegionalTimeOptions"=dword:0000000E
+"RegionalTimeFormat"=dword:00000000
+"BatteryPercentFormat"=dword:00000001
+"IconsDisabledCount"=dword:00000000
+"AirBeamLock"=dword:00000000
+"HomeHotKey"=dword:00000849
+"AdminLoginHotKey"=dword:00000000
+"LogFileName"="\\Temp\\tsd_autosetup\\run\\AppCenterLog.txt"
+"RegFileName"="\\Temp\\tsd_autosetup\\run\\AppCenter.reg"
+"24HourTimeFormat"=dword:00000001
+"TitleFontSize"=dword:00000009
+"TitleBold"=dword:00000000
+"AdapterName"="PCCARD\\PHOTON1"
+"AlternateTitle"=""
+"AdminLoginDisabled"=dword:00000000
+"BrowseExtensions"="exe"
+"Build"=dword:000007E2
+"BrowseFolders"="\\Temp\\tsd_autosetup\\run|\\Windows"
+

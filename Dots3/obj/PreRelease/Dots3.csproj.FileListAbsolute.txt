@@ -1,0 +1,16 @@
+C:\VSProjects\Dots3\Dots3\obj\PreRelease\ResolveAssemblyReference.cache
+C:\VSProjects\Dots3\Dots3\obj\PreRelease\Dots3.DeviceProvisor.resources
+C:\VSProjects\Dots3\Dots3\obj\PreRelease\Dots3.csproj.GenerateResource.Cache
+C:\VSProjects\Dots3\Dots3\bin\PreRelease\SDP3.exe
+C:\VSProjects\Dots3\Dots3\bin\PreRelease\SDP3.pdb
+C:\VSProjects\Dots3\Dots3\obj\PreRelease\SDP3.Properties.Resources.resources
+C:\VSProjects\Dots3\Dots3\obj\PreRelease\SDP3.exe
+C:\VSProjects\Dots3\Dots3\obj\PreRelease\SDP3.pdb
+C:\VSProjects\Dots3 — IMPrjct\Dots3\obj\PreRelease\ResolveAssemblyReference.cache
+C:\VSProjects\Dots3 — IMPrjct\Dots3\obj\PreRelease\Dots3.DeviceProvisor.resources
+C:\VSProjects\Dots3 — IMPrjct\Dots3\obj\PreRelease\Dots3.csproj.GenerateResource.Cache
+C:\VSProjects\Dots3 — IMPrjct\Dots3\bin\PreRelease\SDP3.exe
+C:\VSProjects\Dots3 — IMPrjct\Dots3\bin\PreRelease\SDP3.pdb
+C:\VSProjects\Dots3 — IMPrjct\Dots3\obj\PreRelease\SDP3_IM.Properties.Resources.resources
+C:\VSProjects\Dots3 — IMPrjct\Dots3\obj\PreRelease\SDP3.exe
+C:\VSProjects\Dots3 — IMPrjct\Dots3\obj\PreRelease\SDP3.pdb
