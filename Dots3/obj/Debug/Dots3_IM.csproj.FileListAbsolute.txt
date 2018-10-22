@@ -22,3 +22,11 @@ C:\VSProjects\Dots3 — IMPrjct\Dots3\bin\Debug\SDP3.exe
 C:\VSProjects\Dots3 — IMPrjct\Dots3\bin\Debug\SDP3.pdb
 C:\VSProjects\Dots3 — IMPrjct\Dots3\obj\Debug\SDP3.exe
 C:\VSProjects\Dots3 — IMPrjct\Dots3\obj\Debug\SDP3.pdb
+D:\vsproject\Dots3 — IMPrjct\Dots_IM\Dots3\obj\Debug\ResolveAssemblyReference.cache
+D:\vsproject\Dots3 — IMPrjct\Dots_IM\Dots3\obj\Debug\Dots3.DeviceProvisor.resources
+D:\vsproject\Dots3 — IMPrjct\Dots_IM\Dots3\obj\Debug\SDP3_IM.Properties.Resources.resources
+D:\vsproject\Dots3 — IMPrjct\Dots_IM\Dots3\obj\Debug\Dots3_IM.csproj.GenerateResource.Cache
+D:\vsproject\Dots3 — IMPrjct\Dots_IM\Dots3\obj\Debug\SDP3.exe
+D:\vsproject\Dots3 — IMPrjct\Dots_IM\Dots3\bin\Debug\SDP3.exe
+D:\vsproject\Dots3 — IMPrjct\Dots_IM\Dots3\bin\Debug\SDP3.pdb
+D:\vsproject\Dots3 — IMPrjct\Dots_IM\Dots3\obj\Debug\SDP3.pdb

@@ -20,7 +20,7 @@ namespace Dots3
         string str_dummysrv = "";
         //string str_Server = "tsd_auto_setup:tsdautosetup@ts-glb01";
         string str_Server = "";
-        string str_Current_TSD_Model = "Unknown";
+        string str_Current_TSD_Model = "";
         string str_NIC_Name = "Unknown";
         string macaddress = "";
         string str_Version = Environment.OSVersion.Version.Major.ToString();
@@ -116,10 +116,10 @@ namespace Dots3
         {
             AddToLog("str_Version: " + str_Version);
             AddToLog("Checking TSD model...");
-            str_tsglb_srv = "";
             
-            if (((System.IO.File.Exists("\\Application\\mc30XX.idi") || System.IO.File.Exists("\\Application\\mc30n0.idi")) &&
-                   (str_Version == "5") && (System.IO.File.Exists("\\Application\\30XXc50BenAppl.022.id") || System.IO.File.Exists("\\Application\\30XXc50BenAppl.023.id"))))
+            
+            if ((System.IO.File.Exists("\\Application\\mc30XX.idi") &&
+                   (str_Version == "5") && (System.IO.File.Exists("\\Application\\30XXc50BenAppl.022.id") | System.IO.File.Exists("\\Application\\30XXc50BenAppl.023.id"))))
             {
                 str_Current_TSD_Model = "mc30n0";
                 str_NIC_Name = "photon1";
@@ -132,14 +132,14 @@ namespace Dots3
                 str_NIC_Name = "XWING20_1";
                 str_tsglb_srv = "ts-glb01";
             }
-            else if ((System.IO.File.Exists("\\Application\\mc90XX.idi") || System.IO.File.Exists("\\Application\\mc90n0.idi")) &&
+            else if (System.IO.File.Exists("\\Application\\mc90XX.idi") &&
                    (str_Version == "5") && System.IO.File.Exists("\\Application\\909Xc50BenAppl.036.id"))
             {
                 str_Current_TSD_Model = "mc90n0";
                 str_NIC_Name = "photon1";
                 str_tsglb_srv = "ts-glb02";
             }
-            else if ((System.IO.File.Exists("\\Application\\mc31XX.idi") || System.IO.File.Exists("\\Application\\mc31n0.idi")) &&
+            else if (System.IO.File.Exists("\\Application\\mc31XX.idi") &&
                    (str_Version == "6") && (Registry.CurrentUser.OpenSubKey(@"Software\\Symbol\\MC3100Security") != null))
             {
                 str_Current_TSD_Model = "mc31n0";
@@ -147,7 +147,7 @@ namespace Dots3
                 str_tsglb_srv = "ts-glb02";
             }
 
-            else if ((System.IO.File.Exists("\\Application\\mc91XX.idi") || System.IO.File.Exists("\\Application\\mc91n0.idi")) &&
+            else if (System.IO.File.Exists("\\Application\\mc91XX.idi") &&
                    (str_Version == "6") && (Registry.CurrentUser.OpenSubKey(@"Software\\Symbol\\MC9190Security") != null))
             {
                 str_Current_TSD_Model = "mc91n0";
@@ -155,11 +155,6 @@ namespace Dots3
                 str_tsglb_srv = "ts-glb02";
             }
             AddToLog("Выполнено...10%");
-            AddToLog("TS_SRV: " + str_tsglb_srv);
-            
-            StreamWriter sw = new StreamWriter("\\Temp\\tsglb_srv.txt");
-            sw.WriteLine(str_tsglb_srv);
-            sw.Close();
 
         }
 
@@ -172,23 +167,29 @@ namespace Dots3
             {
                 if (!(currentnic.Name.ToUpper().Contains("USB")) && !(currentnic.Name.ToUpper().Contains("SS1VNDIS1")))
                 {
-                    //Console.Write(currentnic.Name);
-                    //Console.Write("\r\n");
 
                     AddToLog("Адаптер: " + currentnic.Name);
 
                     macaddress = "";
 
-                    //for each j you can get the MAC 
-                    PhysicalAddress address = currentnic.GetPhysicalAddress();
-                    byte[] bytes = address.GetAddressBytes();
-
-                    for (int i = 0; i < bytes.Length; i++)
+                    //for each j you can get the MAC
+                    try
                     {
-                        // Display the physical address in hexadecimal. 
-                        macaddress = macaddress + bytes[i].ToString("X2");
-                    }
+                        PhysicalAddress address = currentnic.GetPhysicalAddress();
+                        byte[] bytes = address.GetAddressBytes();
 
+                        for (int i = 0; i < bytes.Length; i++)
+                        {
+                            // Display the physical address in hexadecimal. 
+                            macaddress = macaddress + bytes[i].ToString("X2");
+                        }
+                    }
+                    catch (Exception)
+                    {
+                    if (macaddress == null);
+                    AddToLog("WiFi не доступен");
+                    }
+                    return;
                     macaddress = macaddress.ToLower();
 
                     AddToLog("MAC-адрес: " + macaddress);
@@ -199,8 +200,8 @@ namespace Dots3
             sw.WriteLine(macaddress);
             sw.Close();
 
-            AddToLog("str_Current_TSD_Model: " + str_Current_TSD_Model);
-            AddToLog("Выполнено...20%");
+            AddToLog("Модель ТСД: " + str_Current_TSD_Model);
+            //AddToLog("Выполнено...20%");
         }
 
         private void DownloadByHTTP(string remotepath, string localpath)
@@ -210,82 +211,60 @@ namespace Dots3
             FileStream fileStream = null;
 
             AddToLog("Downloading :" + remotepath);
-
-            // Creates an HttpWebRequest with the specified URL. 
-            HttpWebRequest myHttpWebRequest = (HttpWebRequest)WebRequest.Create(remotepath);
-
-            myHttpWebResponse = (HttpWebResponse)myHttpWebRequest.GetResponse();
-            //response = myHttpWebResponse.GetResponse();
-            responseStream = myHttpWebResponse.GetResponseStream();
-
-            fileStream = File.Open(localpath, FileMode.Create, FileAccess.Write, FileShare.None);
-            // read up to ten kilobytes at a time
-            int maxRead = 10240;
-            byte[] buffer = new byte[maxRead];
-            int bytesRead = 0;
-            int totalBytesRead = 0;
-
-            // loop until no data is returned
-            while ((bytesRead = responseStream.Read(buffer, 0, maxRead)) > 0)
+            try
             {
-                totalBytesRead += bytesRead;
-                fileStream.Write(buffer, 0, bytesRead);
+                // Creates an HttpWebRequest with the specified URL. 
+                HttpWebRequest myHttpWebRequest = (HttpWebRequest)WebRequest.Create(remotepath);
+
+                myHttpWebResponse = (HttpWebResponse)myHttpWebRequest.GetResponse();
+                //response = myHttpWebResponse.GetResponse();
+                responseStream = myHttpWebResponse.GetResponseStream();
+
+                fileStream = File.Open(localpath, FileMode.Create, FileAccess.Write, FileShare.None);
+                // read up to ten kilobytes at a time
+                int maxRead = 10240;
+                byte[] buffer = new byte[maxRead];
+                int bytesRead = 0;
+                int totalBytesRead = 0;
+
+                // loop until no data is returned
+                while ((bytesRead = responseStream.Read(buffer, 0, maxRead)) > 0)
+                {
+                    totalBytesRead += bytesRead;
+                    fileStream.Write(buffer, 0, bytesRead);
+                }
+
+                if (null != responseStream) responseStream.Close();
+                if (null != response) response.Close();
+                if (null != fileStream) fileStream.Close();
             }
-            
-            if(null != responseStream) responseStream.Close();
-            if(null != response) response.Close();
-            if(null != fileStream) fileStream.Close();
+            catch (WebException webExcp)
+            {
+                // If you reach this point, an exception has been caught.  
+                Console.WriteLine("A WebException has been caught.");
+                // Write out the WebException message.  
+                Console.WriteLine(webExcp.ToString());
+                // Get the WebException status code.  
+                WebExceptionStatus status = webExcp.Status;
+                // If status is WebExceptionStatus.ProtocolError,   
+                //   there has been a protocol error and a WebResponse   
+                //   should exist. Display the protocol error.  
+                if (status == WebExceptionStatus.ProtocolError)
+                {
+                    AddToLog("The server returned protocol error ");
+                    // Get HttpWebResponse so that you can check the HTTP status code.  
+                    HttpWebResponse httpResponse = (HttpWebResponse)webExcp.Response;
+                    Console.WriteLine((int)httpResponse.StatusCode + " - " + httpResponse.StatusCode);
+                }
+                return;
+                }
+             return;
 
-            AddToLog("Download complete :");
-            
-        }
 
-        //private void Download(string ftpServerIP, string filePath)
-        //{
+                AddToLog("Download complete :");
+            }
+        
 
-        //    FtpWebRequest reqFTP;
-        //    try
-        //    {
-        //        FtpRequestCreator creator = new FtpRequestCreator();
-        //        WebRequest.RegisterPrefix("ftp:", creator);
-
-        //        //filePath = <<The full path where the file is to be created. the>>,
-        //        //fileName = <<Name of the file to be createdNeed not name on FTP server. name name()>>
-        //        FileStream outputStream = new FileStream(filePath, FileMode.Create);
-
-        //        reqFTP = (FtpWebRequest)WebRequest.Create(new Uri(ftpServerIP));
-        //        reqFTP.Passive = true;
-        //        reqFTP.Binary = true;
-        //        //reqFTP.Credentials = new NetworkCredential("tsd_auto_setup", "tsdautosetup");
-
-        //        AddToLog("#1");
-        //        //FtpWebResponse response = (FtpWebResponse)reqFTP.GetResponse();
-        //        Stream ftpRequestStream = reqFTP.GetRequestStream();
-
-        //        AddToLog("#2");
-                
-        //        /*
-        //        Stream ftpStream = response.GetResponseStream();
-
-        //        long cl = response.ContentLength;
-        //        int bufferSize = 2048;
-        //        int readCount;
-        //        byte[] buffer = new byte[bufferSize];
-        //        readCount = ftpStream.Read(buffer, 0, bufferSize);
-        //        while (readCount > 0)
-        //        {
-        //            outputStream.Write(buffer, 0, readCount);
-        //            readCount = ftpStream.Read(buffer, 0, bufferSize);
-        //        }
-        //        ftpStream.Close();
-        //        outputStream.Close();
-        //        response.Close(); */
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show(ex.Message.ToString());
-        //    }
-        //}
 
         private void Unzip(string arcFileName, string extractpath)
         {
@@ -295,7 +274,6 @@ namespace Dots3
             {
                 zip.ExtractAll(extractpath, true);
             }
-            //AddToLog("Выполнено...40%");
         }
 
         private void CopyFolder(string sourceFolder, string destFolder)
@@ -320,20 +298,7 @@ namespace Dots3
                 CopyFolder(folder, dest);
             }
         }
-       
-        private void ProccessBootBlock()
-        {
-            AddToLog("Замена блока Boot...");
 
-            if (Directory.Exists(@"\Application\tsd_autosetup\boot")) Directory.Delete(@"\Application\tsd_autosetup\boot", true);
-            Directory.CreateDirectory(@"\Application\tsd_autosetup\boot");
-            AddToLog("Создание папки Boot завершено");
-            CopyFolder(@"\Temp\tsd_autosetup\boot", @"\Application\tsd_autosetup\boot");
-            AddToLog("Копирование папки Boot завершено");
-            
-            AddToLog("Замена блока Boot завершена");
-            //AddToLog("Выполнено...50%");
-        }
 
         private void ProccessSoftBlock()
         {
@@ -346,9 +311,8 @@ namespace Dots3
             CopyFolder(@"\Temp\tsd_autosetup\main\Configs\Application\Startup", @"\Application\Startup");
 
             AddToLog("Замена блока Soft завершена");
-
+            Directory.Delete(@"\Temp\tsd_autosetup\soft");
             SetProgressBar(60);
-            AddToLog("Выполнено...60%");
         }
 
         private void ProccessMainBlock()
@@ -357,7 +321,8 @@ namespace Dots3
 
             //if (Directory.Exists(@"\Application\tsd_autosetup\main")) Directory.Delete(@"\Application\tsd_autosetup\soft", true);
             //Directory.CreateDirectory(@"\Application\tsd_autosetup\soft");
-
+            if (!System.IO.File.Exists(@"\Application\Startup\tsd_autosetup_boot.run")) ; 
+            File.Delete(@"\Application\Startup\tsd_autosetup_boot.run");
             //CopyFolder(@"\Temp\tsd_autosetup\main\Configs\Application\tsd_autosetup", @"\Application");
             CopyFolder(@"\Temp\tsd_autosetup\main\Configs", @"\");
 
@@ -365,7 +330,7 @@ namespace Dots3
 
 
             AddToLog("Замена блока Main завершена");
-            //AddToLog("Выполнено...70%");
+            Directory.Delete(@"\Temp\tsd_autosetup\main");
 
         }
         private void RunProcess(string FRunFile, string FArguments)
@@ -406,18 +371,18 @@ namespace Dots3
           
             RunProcess(@"\Windows\regmerge.exe", @"/d /q \Application");
             RunProcess(@"\Windows\regmerge.exe", @"/d /q \Application\tsd_autosetup\soft\AppCenter");
-            RunProcess(@"\Windows\regmerge.exe", @"/d /q \Temp\tsd_autosetup\main\Setup");
+            //RunProcess(@"\Windows\regmerge.exe", @"/d /q \Temp\tsd_autosetup\main\Setup");
         
-            AddToLog("Замена блока Main завершена");
-            //AddToLog("Выполнено...80%");
+            AddToLog("Применение настроек завершено");
+            Directory.Delete(@"\Temp\tsd_autosetup\temp");
 
          }
         
 
-        void UnloadDataWedge()
-        {
-            AddToLog("UnloadDataWedge...");
-        }
+        //void UnloadDataWedge()
+        //{
+        //    AddToLog("UnloadDataWedge...");
+        //}
 
         public Boolean bUpdateMode = false;
 
@@ -446,37 +411,26 @@ namespace Dots3
 
 
 
-            CheckUpdate();
-            //try
-            //{
-             if (bUpdateMode == false)
-             {
+            //CheckUpdate();
+
+            if (bUpdateMode == false)
+            {
 
                 //Directory.CreateDirectory(@"\Temp\tsd_autosetup");
-                try
-                {
-                 if (Directory.Exists(@"\Temp\tsd_autosetup\boot")) Directory.Delete(@"\Temp\tsd_autosetup\boot", true);
-                 Directory.CreateDirectory(@"\Temp\tsd_autosetup\boot");
-                }
-                catch (Exception f) { }
+
+                if (Directory.Exists(@"\Temp\tsd_autosetup\boot")) Directory.Delete(@"\Temp\tsd_autosetup\boot", true);
+                Directory.CreateDirectory(@"\Temp\tsd_autosetup\boot");
+
                 //RunProcess(@"\Windows\unload.exe", "Motorola DataWedge"); //выгружает DataWedge!!!!!!
                 //WaitFor("Remove Programs Error", 5)
                 //If (WndExists("Remove Programs Error"))
                 //Close("Remove Programs Error")
 
-                try
-                {
-                 if (Directory.Exists(@"\Temp\tsd_autosetup\soft")) Directory.Delete(@"\Temp\tsd_autosetup\soft", true);
+                if (Directory.Exists(@"\Temp\tsd_autosetup\soft")) Directory.Delete(@"\Temp\tsd_autosetup\soft", true);
                 Directory.CreateDirectory(@"\Temp\tsd_autosetup\soft");
-                }
-                catch (Exception f) { }
 
-                try
-                {
                 if (Directory.Exists(@"\Temp\tsd_autosetup\main")) Directory.Delete(@"\Temp\tsd_autosetup\main", true);
                 Directory.CreateDirectory(@"\Temp\tsd_autosetup\main");
-                }
-                catch (Exception f) { }
 
                 if (Directory.Exists(@"\Temp\tsd_autosetup\temp")) Directory.Delete(@"\Temp\tsd_autosetup\temp", true);
                 Directory.CreateDirectory(@"\Temp\tsd_autosetup\temp");
@@ -495,11 +449,10 @@ namespace Dots3
 
                 //if (Directory.Exists(@"\Windows\StartUp")) Directory.Delete(@"\Windows\StartUp", true);
                 //Directory.CreateDirectory(@"\Windows\StartUp");
-              //}
-              //catch (Exception f) { }
+
                 AddToLog("Выполнено Application...");
 
-                //ProccessTSDModel();
+                ProccessTSDModel();
                 ProccessMacAddress();
 
                 SetProgressBar(10);
@@ -519,8 +472,14 @@ namespace Dots3
                 File.Delete(@"\Temp\tsd_autosetup\soft\soft.zip");
 
                 SetProgressBar(25);
-
-                DownloadByHTTP("http://" + str_Server + "/Users/" + macaddress + "/info.zip", @"\Temp\tsd_autosetup\temp\info.zip");
+                try
+                {
+                    DownloadByHTTP("http://" + str_Server + "/Users/" + macaddress + "/info.zip", @"\Temp\tsd_autosetup\temp\info.zip");
+                    Thread.Sleep (1000);
+                    
+                }
+                catch (Exception info) { }
+                return;
                 Unzip(@"\Temp\tsd_autosetup\temp\info.zip", @"\Temp\tsd_autosetup\temp");
                 File.Delete(@"\Temp\tsd_autosetup\temp\info.zip");
 
@@ -528,7 +487,7 @@ namespace Dots3
 
                 //ProccessBootBlock();
                 ProccessSoftBlock();
-                UnloadDataWedge();
+                //UnloadDataWedge();
 
                 ProccessMainBlock();
                 ProccessApply();
@@ -554,7 +513,9 @@ namespace Dots3
 
                 //Read and Replaces text in a file script
                 AddToLog("TS_SRV:" + str_dummysrv);
-               ReplaceInFile(str_mscrfile, "dummysrv", str_dummysrv);
+                ReplaceInFile(str_mscrfile, "dummysrv", str_dummysrv);
+
+                //Write str_dummyusr to Registry
 
 
                 // Возвращаем кнопку "ЗАВЕРШИТЬ"
@@ -587,8 +548,7 @@ namespace Dots3
                 {
                     Close();
                 });
-             }
-            
+            }
             else
             {
                 BeginInvoke((Action)delegate() 
@@ -742,8 +702,8 @@ namespace Dots3
                 string exeFNameOnServer = @"http://" + str_Server + "/" + exefile.Name;
                 double sizeOnServer = GetFileSize(exeFNameOnServer);
 
-                 //Сверяем размеры исполняемого и серверного файлов
-                 //если разные - значит принимаем решение качать файл с сервера
+                // Сверяем размеры исполняемого и серверного файлов
+                // если разные - значит принимаем решение качать файл с сервера
                 if ((exefile.Length != sizeOnServer)) //(было "!=" вместо "=")внес изменения, чтобы при каждой проверке он считал что есть обновление
                 {
                     AddToLog("Обнаружена новая версия");
@@ -768,20 +728,13 @@ namespace Dots3
 
         private void button2_Click(object sender, EventArgs e) //Global
         {
-            str_Server = "dc-ts02/tsd"; // Тестовый хост dc-test03. В дальнейшем необходимо перенести на dc-ts02
-            
-            
+            str_Server = "dc-ts02/tsd"; // Тестовый хост. В дальнейшем необходимо перенести на dc-ts02
+            str_dummysrv = str_tsglb_srv; //сервер подключения, был dc-ts02
             str_rdpfile = @"\Temp\tsd_autosetup\run\global.rdp"; //RDP-файл Global
             str_mscrfile = @"\Temp\tsd_autosetup\run\do_global.mscr"; //Файл скрипта запуска
 
-            Thread workerThread = new Thread(BeginProvising); //Запуск основной части программы
+            Thread workerThread = new Thread(BeginProvising);
             workerThread.Start();
-            ProccessTSDModel();  //запуск процесса определения модели ТСД
-            //str_dummysrv = str_tsglb_srv; //сервер подключения, был dc-ts02
-            using (StreamReader sr = new StreamReader(@"\Temp\tsglb_srv.txt")) //запись файла с именем сервере
-            {                                                                  //было сделано распределение по моделям ТСД а не по чет/нечет мак адреса
-                str_dummysrv = sr.ReadLine();
-            }
 
         }
 
@@ -793,9 +746,9 @@ namespace Dots3
             str_mscrfile = @"\Temp\tsd_autosetup\run\do_galaxy.mscr"; //Файл скрипта запуска
 
 
-            Thread workerThread = new Thread(BeginProvising); //Запуск основной части программы
+            Thread workerThread = new Thread(BeginProvising);
             workerThread.Start();
-            ProccessTSDModel();  //запуск процесса определения модели ТСД
+
         }
 
     }
