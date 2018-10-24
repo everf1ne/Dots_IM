@@ -68,7 +68,7 @@ namespace Dots3
                textBox1.Text            = textBox1.Text + msg + "\r\n";
 
                textBox1.Text            = textBox1.Text + "\r\n";
-               textBox1.SelectionStart  = textBox1.TextLength - 1;
+               textBox1.SelectionStart  = textBox1.TextLength - 2;
                textBox1.ScrollToCaret();
             });
 
@@ -127,7 +127,6 @@ namespace Dots3
                 str_NIC_Name = "jedi10_1";
                 str_tsglb_srv = "ts-glb02";
             }
-            AddToLog("Выполнено...10%");
 
         }
 
@@ -174,7 +173,26 @@ namespace Dots3
             sw.Close();
 
             AddToLog("Модель ТСД: " + str_Current_TSD_Model);
-            //AddToLog("Выполнено...20%");
+        }
+
+        private void GetInfo()
+        {
+            //AddToLog("Загрузка Info...");
+            try
+            {
+                DownloadByHTTP("http://" + str_Server + "/Users/" + macaddress + "/info.zip", @"\Temp\tsd_autosetup\temp\info.zip");
+                //Thread.Sleep (1000);
+
+            }
+            catch (Exception info)
+            {
+                return;
+            }
+            //AddToLog("Распаковка Info...");
+            Unzip(@"\Temp\tsd_autosetup\temp\info.zip", @"\Temp\tsd_autosetup\temp");
+            File.Delete(@"\Temp\tsd_autosetup\temp\info.zip");
+            //AddToLog("Работа с Info....0к");
+            AddToLog("TSD№:" + str_dummyusr);
         }
 
         private void DownloadByHTTP(string remotepath, string localpath)
@@ -183,7 +201,8 @@ namespace Dots3
             Stream responseStream = null;
             FileStream fileStream = null;
 
-            AddToLog("Downloading :" + remotepath);
+            //AddToLog("Downloading :" + remotepath);
+            AddToLog("Downloading .......");
             try
             {
                 // Creates an HttpWebRequest with the specified URL. 
@@ -241,8 +260,8 @@ namespace Dots3
 
         private void Unzip(string arcFileName, string extractpath)
         {
-            AddToLog("Распаковка " + arcFileName + " -> " + extractpath);
-
+            //AddToLog("Распаковка " + arcFileName + " -> " + extractpath);
+            AddToLog("Распаковка ......");
             using (ZipFile zip = ZipFile.Read(arcFileName))
             {
                 zip.ExtractAll(extractpath, true);
@@ -259,7 +278,8 @@ namespace Dots3
                 string name = Path.GetFileName(file);
                 string dest = Path.Combine(destFolder, name);
 
-                AddToLog(file + "->" + dest);
+                //AddToLog(file + "->" + dest);
+                AddToLog("Копирование .....");
                 File.Copy(file, dest, true);
             }
             string[] folders = Directory.GetDirectories(sourceFolder);
@@ -280,30 +300,50 @@ namespace Dots3
             if (Directory.Exists(@"\Application\tsd_autosetup\soft")) Directory.Delete(@"\Application\tsd_autosetup\soft", true); 
             Directory.CreateDirectory(@"\Application\tsd_autosetup\soft");
 
+            try
+            {
+                DownloadByHTTP("http://" + str_Server + "/Models/" + str_Current_TSD_Model + "/soft.zip", "\\Temp\\tsd_autosetup\\soft\\soft.zip");
+                Unzip(@"\Temp\tsd_autosetup\soft\soft.zip", @"\Temp\tsd_autosetup\");
+                File.Delete(@"\Temp\tsd_autosetup\soft\soft.zip");
+            }
+            catch (Exception ProcessSoftBlock)
+            {
+                return;
+            }
+
             CopyFolder(@"\Temp\tsd_autosetup\soft", @"\Application\tsd_autosetup\soft");
             CopyFolder(@"\Temp\tsd_autosetup\main\Configs\Application\Startup", @"\Application\Startup");
 
             AddToLog("Замена блока Soft завершена");
-            Directory.Delete(@"\Temp\tsd_autosetup\soft",true);
-            SetProgressBar(60);
+            //Directory.Delete(@"\Temp\tsd_autosetup\soft",true);
+            //SetProgressBar(60);
         }
 
         private void ProccessMainBlock()
         {
-            AddToLog("Замена блока Main...");
+            AddToLog("Загрузка блока Main...");
 
-            //if (Directory.Exists(@"\Application\tsd_autosetup\main")) Directory.Delete(@"\Application\tsd_autosetup\soft", true);
-            //Directory.CreateDirectory(@"\Application\tsd_autosetup\soft");
-            if (!System.IO.File.Exists(@"\Application\Startup\tsd_autosetup_boot.run")) ; 
-            File.Delete(@"\Application\Startup\tsd_autosetup_boot.run");
+            try
+            {
+                DownloadByHTTP("http://" + str_Server + "/Models/" + str_Current_TSD_Model + "/main.zip", "\\Temp\\tsd_autosetup\\main\\main.zip");
+                Unzip(@"\Temp\tsd_autosetup\main\main.zip", @"\Temp\tsd_autosetup\");
+                File.Delete(@"\Temp\tsd_autosetup\main\main.zip");
+            }
+            catch (Exception ProcessMainBlock) 
+            {
+                return;
+            }
+            SetProgressBar(30);
+            AddToLog("Замена блока Main...");
             //CopyFolder(@"\Temp\tsd_autosetup\main\Configs\Application\tsd_autosetup", @"\Application");
             CopyFolder(@"\Temp\tsd_autosetup\main\Configs", @"\");
-            File.Copy(@"\Temp\tsd_autosetup\main\Setup", @"\Application",true);
+            File.Copy(@"\Temp\tsd_autosetup\main\Setup\AppCenter.reg", @"\Application\AppCenter.reg", true);
+            File.Copy(@"\Temp\tsd_autosetup\main\Setup\Datawedge3.reg", @"\Application\Datawedge3.reg", true);
             CopyFolder(@"\Temp\tsd_autosetup\main\Configs\Temp\tsd_autosetup\run", @"\Temp\tsd_autosetup\run");
 
 
             AddToLog("Замена блока Main завершена");
-            Directory.Delete(@"\Temp\tsd_autosetup\main",true);
+            //Directory.Delete(@"\Temp\tsd_autosetup\main",true);
 
         }
         private void RunProcess(string FRunFile, string FArguments)
@@ -325,7 +365,7 @@ namespace Dots3
             }
         }
 
-        private void StartUpAply()   
+        private void StartUpApply()   
         {
             AddToLog("Применение параметров...");
 
@@ -339,7 +379,7 @@ namespace Dots3
         }
             //CopyFolder(@"\Temp\tsd_autosetup\main\Configs", @"\");
         
-         private void ProccessApply()
+         private void SettingsApply()
          {
           
             RunProcess(@"\Windows\regmerge.exe", @"/d /q \Application");
@@ -347,15 +387,54 @@ namespace Dots3
             //RunProcess(@"\Windows\regmerge.exe", @"/d /q \Temp\tsd_autosetup\main\Setup");
         
             AddToLog("Применение настроек завершено");
-            Directory.Delete(@"\Temp\tsd_autosetup\temp",true);
+            //Directory.Delete(@"\Temp\tsd_autosetup\temp",true);
 
+            using (StreamReader sr = new StreamReader(@"\Temp\tsd_autosetup\temp\info.txt"))
+            {
+                str_dummyusr = sr.ReadLine();
+                str_dummypwd = sr.ReadLine();
+            }
+
+            AddToLog("TSD№:" + str_dummyusr);
+
+            //Read and Replaces text in a file RDP 
+            Encoding unicode = Encoding.Unicode;
+            ReplaceInFile(str_rdpfile, "dummysrv", str_dummysrv);
+
+            //Read and Replaces text in a file script
+            ReplaceInFile(str_mscrfile, "dummyusr", str_dummyusr);
+
+            //Read and Replaces text in a file script 
+            ReplaceInFile(str_mscrfile, "dummypwd", str_dummypwd);
+
+            //Read and Replaces text in a file script
+            AddToLog("TS_SRV:" + str_dummysrv);
+            ReplaceInFile(str_mscrfile, "dummysrv", str_dummysrv);
+            
+            SetProgressBar(90); 
          }
-        
+
+         private void ProcessStart()
+         {
+             AddToLog("Start DataWedge");
+             RunProcess(@"\Application\tsd_autosetup\soft\DataWedge\DWCtlApp.exe", "");
+             Thread.Sleep(1000);
+
+             AddToLog("Start AppCenter");
+             RunProcess(@"\Application\tsd_autosetup\soft\AppCenter\AppCenter.exe", "");
+             Thread.Sleep(1000);
+         }
 
         //void UnloadDataWedge()
         //{
         //    AddToLog("UnloadDataWedge...");
         //}
+         private void CleaningTemp()
+         {
+             Directory.Delete(@"\Temp\tsd_autosetup\main", true);
+             Directory.Delete(@"\Temp\tsd_autosetup\soft", true);
+             Directory.Delete(@"\Temp\tsd_autosetup\temp", true);
+         }
 
         public Boolean bUpdateMode = false;
 
@@ -430,44 +509,45 @@ namespace Dots3
 
                 SetProgressBar(10);
 
-                DownloadByHTTP("http://" + str_Server + "/Models/" + str_Current_TSD_Model + "/main.zip", "\\Temp\\tsd_autosetup\\main\\main.zip");
-                Unzip(@"\Temp\tsd_autosetup\main\main.zip", @"\Temp\tsd_autosetup\");
-                File.Delete(@"\Temp\tsd_autosetup\main\main.zip");
+                //DownloadByHTTP("http://" + str_Server + "/Models/" + str_Current_TSD_Model + "/main.zip", "\\Temp\\tsd_autosetup\\main\\main.zip");
+                //Unzip(@"\Temp\tsd_autosetup\main\main.zip", @"\Temp\tsd_autosetup\");
+                //File.Delete(@"\Temp\tsd_autosetup\main\main.zip");
 
-                SetProgressBar(20);
+                //SetProgressBar(20);
 
                 //DownloadByHTTP("http://" + str_Server + "/Models/" + str_Current_TSD_Model + "/boot.zip", "\\Temp\\tsd_autosetup\\boot\\boot.zip");
                 //Unzip(@"\Temp\tsd_autosetup\boot\boot.zip", @"\Temp\tsd_autosetup\");
                 //File.Delete(@"\Temp\tsd_autosetup\boot\boot.zip");
 
-                DownloadByHTTP("http://" + str_Server + "/Models/" + str_Current_TSD_Model + "/soft.zip", "\\Temp\\tsd_autosetup\\soft\\soft.zip");
-                Unzip(@"\Temp\tsd_autosetup\soft\soft.zip", @"\Temp\tsd_autosetup\");
-                File.Delete(@"\Temp\tsd_autosetup\soft\soft.zip");
+                //DownloadByHTTP("http://" + str_Server + "/Models/" + str_Current_TSD_Model + "/soft.zip", "\\Temp\\tsd_autosetup\\soft\\soft.zip");
+                //Unzip(@"\Temp\tsd_autosetup\soft\soft.zip", @"\Temp\tsd_autosetup\");
+                //File.Delete(@"\Temp\tsd_autosetup\soft\soft.zip");
 
-                SetProgressBar(25);
-                try
-                {
-                    DownloadByHTTP("http://" + str_Server + "/Users/" + macaddress + "/info.zip", @"\Temp\tsd_autosetup\temp\info.zip");
-                    //Thread.Sleep (1000);
+                //SetProgressBar(25);
+                //try
+                //{
+                //    DownloadByHTTP("http://" + str_Server + "/Users/" + macaddress + "/info.zip", @"\Temp\tsd_autosetup\temp\info.zip");
+                //    //Thread.Sleep (1000);
                     
-                }
-                catch (Exception info) 
-                {
-                    return;
-                }
-                Unzip(@"\Temp\tsd_autosetup\temp\info.zip", @"\Temp\tsd_autosetup\temp");
-                File.Delete(@"\Temp\tsd_autosetup\temp\info.zip");
+                //}
+                //catch (Exception info) 
+                //{
+                //    return;
+                //}
+                //Unzip(@"\Temp\tsd_autosetup\temp\info.zip", @"\Temp\tsd_autosetup\temp");
+                //File.Delete(@"\Temp\tsd_autosetup\temp\info.zip");
 
-                SetProgressBar(30);
+                //SetProgressBar(30);
 
                 //ProccessBootBlock();
-                ProccessSoftBlock();
-                //UnloadDataWedge();
-
+                GetInfo();
                 ProccessMainBlock();
-                ProccessApply();
-                StartUpAply();
-
+                SetProgressBar(20);
+                ProccessSoftBlock();
+                SetProgressBar(65);
+                //UnloadDataWedge();
+                SettingsApply();
+                StartUpApply();
                 using (StreamReader sr = new StreamReader(@"\Temp\tsd_autosetup\temp\info.txt"))
                 {
                     str_dummyusr = sr.ReadLine();
@@ -502,23 +582,27 @@ namespace Dots3
                 //});
 
                 AddToLog("Recovery completed.");
-                SetProgressBar(90);
-                AddToLog("Выполнено...90%");
+                //SetProgressBar(90);
+                //AddToLog("Выполнено...90%");
 
-                RunProcess(@"\Application\tsd_autosetup\soft\DataWedge\DWCtlApp.exe", "");
-                AddToLog("Start DataWedge");
+                //RunProcess(@"\Application\tsd_autosetup\soft\DataWedge\DWCtlApp.exe", "");
+                //AddToLog("Start DataWedge");
 
-                RunProcess(@"\Windows\regmerge.exe", @"/d /q \Application\tsd_autosetup\soft\AppCenter");
-                AddToLog("Register AppCenter");
+                //RunProcess(@"\Windows\regmerge.exe", @"/d /q \Application\tsd_autosetup\soft\AppCenter");
+                //AddToLog("Register AppCenter");
 
-                AddToLog("Выполнено...100%");
+                //AddToLog("Выполнено...100%");
                 SetProgressBar(100);
 
+                
+
+                //RunProcess(@"\Application\tsd_autosetup\soft\AppCenter\AppCenter.exe", "");
+                //AddToLog("Start AppCenter");
+                CleaningTemp();
+                ProcessStart();
                 AddToLog("Нажмите Готово");
-
-                RunProcess(@"\Application\tsd_autosetup\soft\AppCenter\AppCenter.exe", "");
-                AddToLog("Start AppCenter");
-
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////                
+                
                 BeginInvoke((Action)delegate()
                 {
                     Close();
