@@ -279,7 +279,7 @@ namespace Dots3
                 string dest = Path.Combine(destFolder, name);
 
                 //AddToLog(file + "->" + dest);
-                AddToLog("Копирование .....");
+                //AddToLog("Копирование .....");
                 File.Copy(file, dest, true);
             }
             string[] folders = Directory.GetDirectories(sourceFolder);
