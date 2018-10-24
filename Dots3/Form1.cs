@@ -60,33 +60,6 @@ namespace Dots3
             writer.Close();
         }
 
-        //Ввод прогрессбара
-        /*
-        private void CopyWithProgress(string[] filenames)
-        {
-            // Display the ProgressBar control.
-            pBar1.Visible = true;
-            // Set Minimum to 1 to represent the first file being copied.
-            pBar1.Minimum = 1;
-            // Set Maximum to the total number of files to copy.
-            pBar1.Maximum = filenames.Length;
-            // Set the initial value of the ProgressBar.
-            pBar1.Value = 1;
-            // Set the Step property to a value of 1 to represent each file being copied.
-            pBar1.Step = 1;
-
-            // Loop through all files to copy.
-            for (int x = 1; x <= filenames.Length; x++)
-            {
-                // Copy the file and increment the ProgressBar if successful.
-                if (CopyFile(filenames[x - 1]) == true)
-                {
-                    // Perform the increment on the ProgressBar.
-                    pBar1.PerformStep();
-                }
-            }
-        } */
-        
         private void AddToLog(string msg)
         {
             //textBox1.Text = textBox1.Text + msg + "\r\n";
@@ -190,7 +163,6 @@ namespace Dots3
                     AddToLog("WiFi не доступен");
                     return;
                     }
-                    //return;
                     macaddress = macaddress.ToLower();
 
                     AddToLog("MAC-адрес: " + macaddress);
@@ -240,7 +212,7 @@ namespace Dots3
                 if (null != fileStream) fileStream.Close();
             }
             catch (WebException webExcp)
-            {
+                {
                 // If you reach this point, an exception has been caught.  
                 Console.WriteLine("A WebException has been caught.");
                 // Write out the WebException message.  
@@ -251,15 +223,15 @@ namespace Dots3
                 //   there has been a protocol error and a WebResponse   
                 //   should exist. Display the protocol error.  
                 if (status == WebExceptionStatus.ProtocolError)
-                {
+                    {
                     AddToLog("The server returned protocol error ");
                     // Get HttpWebResponse so that you can check the HTTP status code.  
                     HttpWebResponse httpResponse = (HttpWebResponse)webExcp.Response;
                     Console.WriteLine((int)httpResponse.StatusCode + " - " + httpResponse.StatusCode);
+                    }
+                    return;
                 }
-                return;
-                }
-             return;
+             //return;
 
 
                 AddToLog("Download complete :");
@@ -312,7 +284,7 @@ namespace Dots3
             CopyFolder(@"\Temp\tsd_autosetup\main\Configs\Application\Startup", @"\Application\Startup");
 
             AddToLog("Замена блока Soft завершена");
-            Directory.Delete(@"\Temp\tsd_autosetup\soft");
+            Directory.Delete(@"\Temp\tsd_autosetup\soft",true);
             SetProgressBar(60);
         }
 
@@ -326,12 +298,12 @@ namespace Dots3
             File.Delete(@"\Application\Startup\tsd_autosetup_boot.run");
             //CopyFolder(@"\Temp\tsd_autosetup\main\Configs\Application\tsd_autosetup", @"\Application");
             CopyFolder(@"\Temp\tsd_autosetup\main\Configs", @"\");
-
+            File.Copy(@"\Temp\tsd_autosetup\main\Setup", @"\Application",true);
             CopyFolder(@"\Temp\tsd_autosetup\main\Configs\Temp\tsd_autosetup\run", @"\Temp\tsd_autosetup\run");
 
 
             AddToLog("Замена блока Main завершена");
-            Directory.Delete(@"\Temp\tsd_autosetup\main");
+            Directory.Delete(@"\Temp\tsd_autosetup\main",true);
 
         }
         private void RunProcess(string FRunFile, string FArguments)
@@ -365,17 +337,17 @@ namespace Dots3
             catch (Exception f) { }
             AddToLog("Применение параметров... ok");
         }
-            //CopyFolder(@"\Temp\tsd_autosetup\main\mainConfigs", @"\");
+            //CopyFolder(@"\Temp\tsd_autosetup\main\Configs", @"\");
         
          private void ProccessApply()
          {
           
             RunProcess(@"\Windows\regmerge.exe", @"/d /q \Application");
-            RunProcess(@"\Windows\regmerge.exe", @"/d /q \Application\tsd_autosetup\soft\AppCenter");
+            //RunProcess(@"\Windows\regmerge.exe", @"/d /q \Application\tsd_autosetup\soft\AppCenter");
             //RunProcess(@"\Windows\regmerge.exe", @"/d /q \Temp\tsd_autosetup\main\Setup");
         
             AddToLog("Применение настроек завершено");
-            Directory.Delete(@"\Temp\tsd_autosetup\temp");
+            Directory.Delete(@"\Temp\tsd_autosetup\temp",true);
 
          }
         
@@ -483,7 +455,6 @@ namespace Dots3
                 {
                     return;
                 }
-                //return;
                 Unzip(@"\Temp\tsd_autosetup\temp\info.zip", @"\Temp\tsd_autosetup\temp");
                 File.Delete(@"\Temp\tsd_autosetup\temp\info.zip");
 
