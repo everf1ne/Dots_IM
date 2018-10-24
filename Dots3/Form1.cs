@@ -188,8 +188,9 @@ namespace Dots3
                     {
                     if (macaddress == null);
                     AddToLog("WiFi не доступен");
-                    }
                     return;
+                    }
+                    //return;
                     macaddress = macaddress.ToLower();
 
                     AddToLog("MAC-адрес: " + macaddress);
@@ -478,8 +479,11 @@ namespace Dots3
                     //Thread.Sleep (1000);
                     
                 }
-                catch (Exception info) { }
-                return;
+                catch (Exception info) 
+                {
+                    return;
+                }
+                //return;
                 Unzip(@"\Temp\tsd_autosetup\temp\info.zip", @"\Temp\tsd_autosetup\temp");
                 File.Delete(@"\Temp\tsd_autosetup\temp\info.zip");
 
