@@ -475,7 +475,7 @@ namespace Dots3
                 try
                 {
                     DownloadByHTTP("http://" + str_Server + "/Users/" + macaddress + "/info.zip", @"\Temp\tsd_autosetup\temp\info.zip");
-                    Thread.Sleep (1000);
+                    //Thread.Sleep (1000);
                     
                 }
                 catch (Exception info) { }
