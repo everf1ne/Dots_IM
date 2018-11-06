@@ -733,7 +733,8 @@ namespace Dots3
         private void button3_Click(object sender, EventArgs e) //IM Sklad
         {
             str_Server = "dc-test03/tsd/tsd_im"; // Тестовый хост. В дальнейшем необходимо перенести на dc-ts04
-            str_dummysrv = str_ts_srv = "dc-ts04"; //сервер подключения
+            str_dummysrv = str_ts_srv;
+            str_ts_srv = "dc-ts04"; //сервер подключения
             str_rdpfile = @"\Temp\tsd_autosetup\run\galaxy.rdp"; //RDP-файл Galaxy
             str_mscrfile = @"\Temp\tsd_autosetup\run\do_galaxy.mscr"; //Файл скрипта запуска
 
