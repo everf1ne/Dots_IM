@@ -29,6 +29,8 @@ namespace Dots3
         string str_rdpfile = "";
         string str_mscrfile = "";
         string str_ts_srv = "";
+        string str_AlternateTitle = "";
+        string str_ipadress = "";
 
         private HttpWebResponse myHttpWebResponse;
         private Stream receiveStream;
@@ -101,7 +103,7 @@ namespace Dots3
             else if ((System.IO.File.Exists("\\Application\\mc32XX.idi") &&
                    (str_Version == "7") && (Registry.CurrentUser.OpenSubKey(@"Software\\Symbol\\MC32N0Security") != null)))
             {
-                str_Current_TSD_Model = "mc32XX";
+                str_Current_TSD_Model = "mc32n0";
                 str_NIC_Name = "XWING20_1";
                 str_ts_srv = "ts-glb01";
             }
@@ -143,7 +145,7 @@ namespace Dots3
                     AddToLog("Адаптер: " + currentnic.Name);
 
                     macaddress = "";
-
+                    str_ipadress = "";
                     //for each j you can get the MAC
                     try
                     {
@@ -155,50 +157,57 @@ namespace Dots3
                             // Display the physical address in hexadecimal. 
                             macaddress = macaddress + bytes[i].ToString("X2");
                         }
+                        
+                        IPAddress ipadress = currentnic.CurrentIpAddress;
+                        byte[] bytess = ipadress.GetAddressBytes();
+                        
+                        for (int i = 0; i < bytess.Length; i++)
+                        {
+                            str_ipadress = ipadress + bytess[i].ToString("X2");
+                        }
                     }
-                    catch (Exception macadress)
+                    catch (Exception)
                     {
                     if (macaddress == null);
                     AddToLog("WiFi не доступен");
                     return;
                     }
                     macaddress = macaddress.ToLower();
-
+                    str_ipadress = str_ipadress.ToLower();
                     AddToLog("MAC-адрес: " + macaddress);
+                    AddToLog("IP-адрес: " + str_ipadress);
                 }
             }
 
-            StreamWriter sw = new StreamWriter("\\Temp\\tsd_autosetup\\boot\\mac_addr.txt");
-            sw.WriteLine(macaddress);
-            sw.Close();
+            StreamWriter mac = new StreamWriter("\\Temp\\tsd_autosetup\\boot\\mac_addr.txt");
+            mac.WriteLine(macaddress);
+            mac.Close();
 
-            StreamWriter ts = new StreamWriter(@"\Temp\tsd_autosetup\boot\ts-srv.txt");
-            ts.WriteLine(str_ts_srv);
-            ts.Close();
-
+            StreamWriter ip = new StreamWriter("\\Temp\\tsd_autosetup\\boot\\IP_addr.txt");
+            ip.WriteLine(str_ipadress);
+            ip.Close();
 
             AddToLog("Модель ТСД: " + str_Current_TSD_Model);
-            AddToLog("Сервер ТСД: " + str_ts_srv);
         }
 
         private void GetInfo()
         {
-            AddToLog("Загрузка Info...");
+            //AddToLog("Загрузка Info...");
             try
             {
                 DownloadByHTTP("http://" + str_Server + "/Users/" + macaddress + "/info.zip", @"\Temp\tsd_autosetup\temp\info.zip");
                 //Thread.Sleep (1000);
 
             }
-            catch (WebException info)
+            catch (Exception info)
             {
                 return;
             }
-            AddToLog("Распаковка Info...");
+            //AddToLog("Распаковка Info...");
             Unzip(@"\Temp\tsd_autosetup\temp\info.zip", @"\Temp\tsd_autosetup\temp");
             File.Delete(@"\Temp\tsd_autosetup\temp\info.zip");
-            AddToLog("Работа с Info....0к");
-            //AddToLog("TSD№:" + str_dummyusr);
+            //AddToLog("Работа с Info....0к");
+            AddToLog("TSD№:" + str_dummyusr);
         }
 
         private void DownloadByHTTP(string remotepath, string localpath)
@@ -208,7 +217,7 @@ namespace Dots3
             FileStream fileStream = null;
 
             //AddToLog("Downloading :" + remotepath);
-            //AddToLog("Downloading .......");
+            AddToLog("Downloading .......");
             try
             {
                 // Creates an HttpWebRequest with the specified URL. 
@@ -238,26 +247,36 @@ namespace Dots3
             }
             catch (WebException webExcp)
                 {
+                // If you reach this point, an exception has been caught.  
+                Console.WriteLine("A WebException has been caught.");
+                // Write out the WebException message.  
+                Console.WriteLine(webExcp.ToString());
+                // Get the WebException status code.  
                 WebExceptionStatus status = webExcp.Status;
+                // If status is WebExceptionStatus.ProtocolError,   
+                //   there has been a protocol error and a WebResponse   
+                //   should exist. Display the protocol error.  
                 if (status == WebExceptionStatus.ProtocolError)
-                {
+                    {
+                    AddToLog("The server returned protocol error ");
+                    // Get HttpWebResponse so that you can check the HTTP status code.  
                     HttpWebResponse httpResponse = (HttpWebResponse)webExcp.Response;
-                    AddToLog("The srv returned error-" + httpResponse.StatusCode);
+                    Console.WriteLine((int)httpResponse.StatusCode + " - " + httpResponse.StatusCode);
+                    }
+                    return;
                 }
-                return;
-                }
-             return;
+             //return;
 
 
-                //AddToLog("Загрузка завершена :");
+                AddToLog("Download complete :");
             }
         
 
 
         private void Unzip(string arcFileName, string extractpath)
         {
-            AddToLog("Распаковка " + arcFileName + " -> " + extractpath);
-            //AddToLog("Распаковка ......");
+            //AddToLog("Распаковка " + arcFileName + " -> " + extractpath);
+            AddToLog("Распаковка ......");
             using (ZipFile zip = ZipFile.Read(arcFileName))
             {
                 zip.ExtractAll(extractpath, true);
@@ -302,7 +321,7 @@ namespace Dots3
                 Unzip(@"\Temp\tsd_autosetup\soft\soft.zip", @"\Temp\tsd_autosetup\");
                 File.Delete(@"\Temp\tsd_autosetup\soft\soft.zip");
             }
-            catch (WebException ProcessSoftBlock)
+            catch (Exception ProcessSoftBlock)
             {
                 return;
             }
@@ -325,7 +344,7 @@ namespace Dots3
                 Unzip(@"\Temp\tsd_autosetup\main\main.zip", @"\Temp\tsd_autosetup\");
                 File.Delete(@"\Temp\tsd_autosetup\main\main.zip");
             }
-            catch (WebException ProcessMainBlock) 
+            catch (Exception ProcessMainBlock) 
             {
                 return;
             }
@@ -395,7 +414,7 @@ namespace Dots3
 
             //Read and Replaces text in a file RDP 
             Encoding unicode = Encoding.Unicode;
-            
+            ReplaceInFile(str_rdpfile, "dummysrv", str_dummysrv);
 
             //Read and Replaces text in a file script
             ReplaceInFile(str_mscrfile, "dummyusr", str_dummyusr);
@@ -403,17 +422,10 @@ namespace Dots3
             //Read and Replaces text in a file script 
             ReplaceInFile(str_mscrfile, "dummypwd", str_dummypwd);
 
-            using (StreamReader sr = new StreamReader(@"\Temp\tsd_autosetup\boot\ts-srv.txt"))
-            {
-                str_dummysrv = sr.ReadLine();
-            }
-
             //Read and Replaces text in a file script
             AddToLog("TS_SRV:" + str_dummysrv);
             ReplaceInFile(str_mscrfile, "dummysrv", str_dummysrv);
-
-            //Encoding unicode = Encoding.Unicode;
-            ReplaceInFile(str_rdpfile, "dummysrv", str_dummysrv);
+            
             SetProgressBar(90); 
          }
 
@@ -444,6 +456,7 @@ namespace Dots3
         void BeginProvising()
         {
             AddToLogDelegate LogUpdater = AddToLog;
+            CheckUpdate();
 
             // Возвращаем кнопку "ЗАВЕРШИТЬ"
             BeginInvoke((Action)delegate()
@@ -471,6 +484,8 @@ namespace Dots3
             if (bUpdateMode == false)
             {
 
+                //Directory.CreateDirectory(@"\Temp\tsd_autosetup");
+
                 if (Directory.Exists(@"\Temp\tsd_autosetup\boot")) Directory.Delete(@"\Temp\tsd_autosetup\boot", true);
                 Directory.CreateDirectory(@"\Temp\tsd_autosetup\boot");
 
@@ -491,21 +506,63 @@ namespace Dots3
                 if (Directory.Exists(@"\Temp\tsd_autosetup\run")) Directory.Delete(@"\Temp\tsd_autosetup\run", true);
                 Directory.CreateDirectory(@"\Temp\tsd_autosetup\run");
 
+                //Directory.CreateDirectory(@"\Application\tsd_autosetup");
                 AddToLog("Выполнено Temp...");
+
+                AddToLog("Выполнение замены Startup...");
+                //if (!System.IO.File.Exists(@"\Application\Startup\tsd_autosetup_boot.run"));
+                //if (Directory.Exists(@"\Application\Startup")) Directory.Delete(@"\Application\Startup", true);
+                //Directory.CreateDirectory(@"\Application\Startup");
+                //AddToLog("Выполненa заменa Startup...");
+
+                //if (Directory.Exists(@"\Windows\StartUp")) Directory.Delete(@"\Windows\StartUp", true);
+                //Directory.CreateDirectory(@"\Windows\StartUp");
+
                 AddToLog("Выполнено Application...");
 
                 ProccessTSDModel();
                 ProccessMacAddress();
+
                 SetProgressBar(10);
+
+                //DownloadByHTTP("http://" + str_Server + "/Models/" + str_Current_TSD_Model + "/main.zip", "\\Temp\\tsd_autosetup\\main\\main.zip");
+                //Unzip(@"\Temp\tsd_autosetup\main\main.zip", @"\Temp\tsd_autosetup\");
+                //File.Delete(@"\Temp\tsd_autosetup\main\main.zip");
+
+                //SetProgressBar(20);
+
+                //DownloadByHTTP("http://" + str_Server + "/Models/" + str_Current_TSD_Model + "/boot.zip", "\\Temp\\tsd_autosetup\\boot\\boot.zip");
+                //Unzip(@"\Temp\tsd_autosetup\boot\boot.zip", @"\Temp\tsd_autosetup\");
+                //File.Delete(@"\Temp\tsd_autosetup\boot\boot.zip");
+
+                //DownloadByHTTP("http://" + str_Server + "/Models/" + str_Current_TSD_Model + "/soft.zip", "\\Temp\\tsd_autosetup\\soft\\soft.zip");
+                //Unzip(@"\Temp\tsd_autosetup\soft\soft.zip", @"\Temp\tsd_autosetup\");
+                //File.Delete(@"\Temp\tsd_autosetup\soft\soft.zip");
+
+                //SetProgressBar(25);
+                //try
+                //{
+                //    DownloadByHTTP("http://" + str_Server + "/Users/" + macaddress + "/info.zip", @"\Temp\tsd_autosetup\temp\info.zip");
+                //    //Thread.Sleep (1000);
+                    
+                //}
+                //catch (Exception info) 
+                //{
+                //    return;
+                //}
+                //Unzip(@"\Temp\tsd_autosetup\temp\info.zip", @"\Temp\tsd_autosetup\temp");
+                //File.Delete(@"\Temp\tsd_autosetup\temp\info.zip");
+
+                //SetProgressBar(30);
+
+                //ProccessBootBlock();
                 GetInfo();
-                SetProgressBar(20);
                 ProccessMainBlock();
-                SetProgressBar(45);
+                SetProgressBar(20);
                 ProccessSoftBlock();
-                SetProgressBar(80);
+                SetProgressBar(65);
                 //UnloadDataWedge();
                 SettingsApply();
-                SetProgressBar(85);
                 StartUpApply();
                 using (StreamReader sr = new StreamReader(@"\Temp\tsd_autosetup\temp\info.txt"))
                 {
@@ -515,6 +572,19 @@ namespace Dots3
 
                 AddToLog("TSD№:" + str_dummyusr);
 
+                //Read and Replaces text in a file RDP 
+                Encoding unicode = Encoding.Unicode;
+                ReplaceInFile(str_rdpfile, "dummysrv", str_dummysrv);
+
+                //Read and Replaces text in a file script
+                ReplaceInFile(str_mscrfile, "dummyusr", str_dummyusr);
+
+                //Read and Replaces text in a file script 
+                ReplaceInFile(str_mscrfile, "dummypwd", str_dummypwd);
+
+                //Read and Replaces text in a file script
+                AddToLog("TS_SRV:" + str_dummysrv);
+                ReplaceInFile(str_mscrfile, "dummysrv", str_dummysrv);
 
                 //Write str_dummyusr to Registry
 
@@ -528,11 +598,24 @@ namespace Dots3
                 //});
 
                 AddToLog("Recovery completed.");
-                SetProgressBar(90);
+                //SetProgressBar(90);
+                //AddToLog("Выполнено...90%");
 
+                //RunProcess(@"\Application\tsd_autosetup\soft\DataWedge\DWCtlApp.exe", "");
+                //AddToLog("Start DataWedge");
+
+                //RunProcess(@"\Windows\regmerge.exe", @"/d /q \Application\tsd_autosetup\soft\AppCenter");
+                //AddToLog("Register AppCenter");
+
+                //AddToLog("Выполнено...100%");
+                SetProgressBar(100);
+
+                
+
+                //RunProcess(@"\Application\tsd_autosetup\soft\AppCenter\AppCenter.exe", "");
+                //AddToLog("Start AppCenter");
                 CleaningTemp();
                 ProcessStart();
-                SetProgressBar(100);
                 AddToLog("Нажмите Готово");
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////                
                 
@@ -733,8 +816,9 @@ namespace Dots3
         private void button3_Click(object sender, EventArgs e) //IM Sklad
         {
             str_Server = "dc-test03/tsd/tsd_im"; // Тестовый хост. В дальнейшем необходимо перенести на dc-ts04
-            str_dummysrv = str_ts_srv;
-            str_ts_srv = "dc-ts04"; //сервер подключения
+            //str_dummysrv = str_ts_srv;
+            str_ts_srv = "ts-gal01"; //сервер подключения
+            str_dummysrv = "ts-gal01"; //сервер подключения
             str_rdpfile = @"\Temp\tsd_autosetup\run\galaxy.rdp"; //RDP-файл Galaxy
             str_mscrfile = @"\Temp\tsd_autosetup\run\do_galaxy.mscr"; //Файл скрипта запуска
 
